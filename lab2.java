@@ -169,7 +169,8 @@ public class lab2 {
             // Keep track of the number of lines in the files (needed for identiying which
             // line a label is on)
             int lineCount = 0;
-
+            String currentLabelName = null;
+            
             // first pass find labels
             // also added instructions to arrayList
             line = reader.readLine();
@@ -218,6 +219,7 @@ public class lab2 {
                             // check if the string contains a $, otherwise we know that the
 
                             finalLabelName = words[i].substring(0, indexOfColon);
+                            currentLabelName = finalLabelName.trim();
                             finalLabelInstruction += (" " + words[i].substring(indexOfColon + 1, indexOfHash));
                         } else {
                             isComment = true;
@@ -236,6 +238,7 @@ public class lab2 {
 
                         // Identify the label and if necessary start the label instructions
                         finalLabelName = words[i].substring(0, indexOfColon);
+                        currentLabelName = finalLabelName.trim();
                         finalLabelInstruction += (" " + words[i].substring(indexOfColon + 1));
                     } else if (indexOfHash >= 0) {
                         isComment = true;
@@ -259,10 +262,11 @@ public class lab2 {
                 finalLabelInstruction = finalLabelInstruction.trim();
 
                 if (finalInstruction != null && finalInstruction.length() > 0) {
-                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalInstruction, lineCount);
+                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalInstruction, lineCount);                    
                     if (instruction == null) {
                         break;
                     } else {
+                        instruction.setLabelName(currentLabelName);
                         instructionsList.add(instruction);
                     }
 
@@ -277,7 +281,7 @@ public class lab2 {
                     labelToInstructionMap.put(finalLabelName, finalLabelInstruction);
                     //instructionArray.add(finalLabelInstruction);
 
-                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalInstruction, lineCount);
+                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalLabelInstruction, lineCount);
                     if (instruction == null) {
                         break;
                     } else {

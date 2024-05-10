@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "lab2",
+            "request": "launch",
+            "mainClass": "lab2",
+            "projectName": "CPE315_LAB3_DRAFT_68b0855"
+        },
+        {
+            "type": "java",
+            "name": "lab3 with args",
+            "request": "launch",
+            "mainClass": "lab2",
+            "projectName": "CPE315_LAB3_DRAFT_68b0855",
+            "args": [
+                "input1.asm" //,
+                //"path/to/your/script_file" // Optional: remove this line if no script file is to be passed
+            ]
+        }
+    ]
+}

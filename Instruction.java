@@ -9,13 +9,14 @@ public class Instruction {
     private String shamt;
     private String immediate;
     private String jump;
+    private String labelName;
 
     // Constructor
     public Instruction() {
 
     }
 
-    public Instruction(String operationString, String opcode, String dest, String source, String target, String function, String shamt, String immediate, String jump) {
+    public Instruction(String operationString, String opcode, String dest, String source, String target, String function, String shamt, String immediate, String jump, String labelName) {
         this.operationString = operationString;
         this.opcode = opcode;
         this.dest = dest;
@@ -25,8 +26,17 @@ public class Instruction {
         this.function = function;
         this.immediate = immediate;
         this.jump = jump;
+        this.labelName = labelName;
     }
 
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
+    }
+
+    public String getLabelName() {
+        return this.labelName;
+    }
+    
     public void setOperationString(String operationString) {
         this.operationString = operationString;
     }

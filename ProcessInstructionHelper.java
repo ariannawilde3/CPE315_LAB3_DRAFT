@@ -47,9 +47,9 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
-                    destIndex = Integer.parseInt(instruction.getDest(), 2);
+                    targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] + immediate;
+                    lab2.Registers[targetIndex] = lab2.Registers[sourceIndex] + immediate;
                     break;
 
                 case "sll":
@@ -88,13 +88,10 @@ public class ProcessInstructionHelper {
 
                 case "beq":
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
-                    targetIndex = Integer.parseInt(instruction.getTarget(), 2);
-                    label = instruction.getImm();
-            
-                    labelAddr = getLabelAddr(label);
+                    targetIndex = Integer.parseInt(instruction.getTarget(), 2);            
             
                     if (lab2.Registers[sourceIndex] == lab2.Registers[targetIndex]) {
-                        lab2.pc = labelAddr;  
+                        lab2.pc =  getLabelAddr(instruction.getLabelName());;  
                     }
 
                     break;
@@ -103,12 +100,11 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
-                    label = instruction.getImm();
-
-                    labelAddr = getLabelAddr(label);
             
+                    // if(R[rs]!=R[rt])
+                    // PC=PC+1+BranchAddr
                     if (lab2.Registers[sourceIndex] != lab2.Registers[targetIndex]) {
-                        lab2.pc = labelAddr;  
+                        lab2.pc = getLabelAddr(instruction.getLabelName());  
                     }
 
                     break; 
@@ -126,10 +122,10 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
-                    sourceIndex = Integer.parseInt(instruction.getSource(), 2);
+                    targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
                     int memoryAddressSW = lab2.Registers[sourceIndex] + immediate;
-                    lab2.dataMemory[memoryAddressSW] = lab2.Registers[sourceIndex];
+                    lab2.dataMemory[memoryAddressSW] = lab2.Registers[targetIndex];
 
                     break; 
 
@@ -167,8 +163,13 @@ public class ProcessInstructionHelper {
             }
         }
 
-        public static int getLabelAddr(String immediate) {
-            int addr = Integer.parseInt(immediate);
+        public static int getLabelAddr(String labelName) {
+            int addr = -1;
+            
+            if(labelName != null && labelName != "") {
+                addr = lab2.labelToLineMap.get(labelName) - 1;
+            }
+
             return addr;
         }
     }
