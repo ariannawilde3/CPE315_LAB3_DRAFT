@@ -2,7 +2,8 @@ public class ProcessInstructionHelper {
     public ProcessInstructionHelper() {
 
     }
-    public static void ProcessInstruction(Instruction instruction) {                  
+    // return true if pc is moved
+    public static Boolean ProcessInstruction(Instruction instruction) {                  
             int j = 0;
             String label;
             int sourceIndex = 0;
@@ -10,7 +11,7 @@ public class ProcessInstructionHelper {
             int destIndex = 0;
             int immediate = 0;
             int memoryAddress = 0;
-            int labelAddr = 0;
+            Boolean pcMoved = false;
 
             switch(instruction.getOperationString()){
 
@@ -47,15 +48,24 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
+                    if (instruction.getImm().charAt(0) == '1') {
+                        // It's a 16-bit binary, adjust for two's complement if negative
+                        immediate = -1 * ((1 << instruction.getImm().length()) - immediate);
+                    }
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
-                    
+
                     lab2.Registers[targetIndex] = lab2.Registers[sourceIndex] + immediate;
+
                     break;
 
                 case "sll":
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
+                    if (instruction.getImm().charAt(0) == '1') {
+                        // It's a 16-bit binary, adjust for two's complement if negative
+                        immediate = -1 * ((1 << instruction.getImm().length()) - immediate);
+                    }
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
             
                     lab2.Registers[destIndex] = lab2.Registers[sourceIndex] << immediate;
@@ -91,7 +101,8 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);            
             
                     if (lab2.Registers[sourceIndex] == lab2.Registers[targetIndex]) {
-                        lab2.pc =  getLabelAddr(instruction.getLabelName());;  
+                        lab2.pc =  getLabelAddr(instruction.getLabelName());  
+                        pcMoved = true;
                     }
 
                     break;
@@ -105,6 +116,7 @@ public class ProcessInstructionHelper {
                     // PC=PC+1+BranchAddr
                     if (lab2.Registers[sourceIndex] != lab2.Registers[targetIndex]) {
                         lab2.pc = getLabelAddr(instruction.getLabelName());  
+                        pcMoved = true;
                     }
 
                     break; 
@@ -112,16 +124,25 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
-                    destIndex = Integer.parseInt(instruction.getDest(), 2);
+                    if (instruction.getImm().charAt(0) == '1') {
+                        // It's a 16-bit binary, adjust for two's complement if negative
+                        immediate = -1 * ((1 << instruction.getImm().length()) - immediate);
+                    }
+                    
+                    targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
                     memoryAddress = lab2.Registers[sourceIndex] + immediate;
-                    lab2.Registers[destIndex] = lab2.dataMemory[memoryAddress];
+                    lab2.Registers[targetIndex] = lab2.dataMemory[memoryAddress];
 
                     break; 
                 case "sw":
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     immediate = Integer.parseInt(instruction.getImm(), 2);
+                    if (instruction.getImm().charAt(0) == '1') {
+                        // It's a 16-bit binary, adjust for two's complement if negative
+                        immediate = -1 * ((1 << instruction.getImm().length()) - immediate);
+                    }
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
                     int memoryAddressSW = lab2.Registers[sourceIndex] + immediate;
@@ -130,11 +151,8 @@ public class ProcessInstructionHelper {
                     break; 
 
                 case "j":
-
-                    label = instruction.getImm();
-
-                    j = getLabelAddr(label);
-                    lab2.pc = j;
+                    lab2.pc = getLabelAddr(instruction.getLabelName());
+                    pcMoved = true;
 
                     break;
 
@@ -142,16 +160,15 @@ public class ProcessInstructionHelper {
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     lab2.pc = lab2.Registers[sourceIndex];
+                    pcMoved = true;
 
                     break;
 
                 case "jal":
-
-                    label = instruction.getImm();
-
-                    j = getLabelAddr(label);
+                
                     lab2.Registers[31] = lab2.pc + 1;
-                    lab2.pc = j; 
+                    lab2.pc = getLabelAddr(instruction.getLabelName());
+                    pcMoved = true;
 
                     break;
 
@@ -161,13 +178,15 @@ public class ProcessInstructionHelper {
                     break;
 
             }
+
+            return pcMoved;
         }
 
         public static int getLabelAddr(String labelName) {
             int addr = -1;
             
             if(labelName != null && labelName != "") {
-                addr = lab2.labelToLineMap.get(labelName) - 1;
+                addr = lab2.labelToLineMap.get(labelName);
             }
 
             return addr;

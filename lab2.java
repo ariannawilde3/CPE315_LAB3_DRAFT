@@ -1,7 +1,9 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -52,18 +54,20 @@ public class lab2 {
 
     
     public static void main(String[] args) {
-
         try {
             if (args.length < 1) {
                 System.out.println("You need to specify the full path to the input file.");
                 return;
             }
-            // readAndProcessFile("test.asm");
-            readAndProcessFile(args[0]);
+            InputStream input = System.in;
+            if (args.length > 1) {
+                input = new FileInputStream(args[1]);  // Open the script file as an input stream
+            }
+            readAndProcessFile(args[0], input);
         } catch (Exception ex) {
-            System.out.println("Exception occured");
+            System.out.println("Exception occurred: " + ex.getMessage());
+            ex.printStackTrace();
         }
-
     }
 
 
@@ -72,55 +76,85 @@ public class lab2 {
     // check if hashtag
     // check if white space and !$ <= this tells us instruction
     // if next char is : lable! put in hash
-    public static void readAndProcessFile(String fileNameWithPath) throws Exception {
-        Scanner scanner = new Scanner(System.in);
+    public static void readAndProcessFile(String fileNameWithPath, InputStream input) throws Exception {
+        Scanner scanner = new Scanner(input);
         String command = "";
+        Boolean printCommands = false;
         int numSteps;
 
         firstPass(fileNameWithPath);
 
-        while (!command.equals("q")) {
-            System.out.print("Enter command (h for help): ");
-            command = scanner.nextLine();
-            String[] tokens = command.split("\\s+");
+        if(input != System.in) {
+            printCommands = true;
+        }
 
+        while (!command.equals("q")) {
+           
+            if(!printCommands) {
+                System.out.print("mips> ");
+            }
+            
+            command = scanner.nextLine();
+
+            if(printCommands) {
+                System.out.println("mips> " + command);
+            }
+
+            String[] tokens = command.split("\\s+");
+            
             switch (tokens[0]) {
                 case "h":
                     System.out.println("Available commands:");
                     System.out.println("h = show help");
                     System.out.println("d = dump register state");
-                    System.out.println("s [num] = step through num instructions of the program");
+                    System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
+                    System.out.println("s num = step through num instructions of the program");
                     System.out.println("r = run until the program ends");
                     System.out.println("m num1 num2 = display data memory from location num1 to num2");
                     System.out.println("c = clear all registers, memory, and the program counter to 0");
                     System.out.println("q = exit the program");
+
                     break;
 
                 case "d":
-                    System.out.println("Register state:");
-                    for (int i = 0; i < Registers.length; i++) {
-                        System.out.printf("$%d: %d\n", i, Registers[i]);
-                    }
+                    System.out.println();
+                    System.out.printf("pc = %d\n", pc); // Assuming 'pc' is your program counter variable
+                    System.out.printf("$0 = %-11d $v0 = %-10d $v1 = %-10d $a0 = %-10d\n", Registers[0], Registers[2], Registers[3], Registers[4]);
+                    System.out.printf("$a1 = %-10d $a2 = %-10d $a3 = %-10d $t0 = %-10d\n", Registers[5], Registers[6], Registers[7], Registers[8]);
+                    System.out.printf("$t1 = %-10d $t2 = %-10d $t3 = %-10d $t4 = %-10d\n", Registers[9], Registers[10], Registers[11], Registers[12]);
+                    System.out.printf("$t5 = %-10d $t6 = %-10d $t7 = %-10d $s0 = %-10d\n", Registers[13], Registers[14], Registers[15], Registers[16]);
+                    System.out.printf("$s1 = %-10d $s2 = %-10d $s3 = %-10d $s4 = %-10d\n", Registers[17], Registers[18], Registers[19], Registers[20]);
+                    System.out.printf("$s5 = %-10d $s6 = %-10d $s7 = %-10d $t8 = %-10d\n", Registers[21], Registers[22], Registers[23], Registers[24]);
+                    System.out.printf("$t9 = %-10d $sp = %-10d $ra = %-10d\n", Registers[25], Registers[29], Registers[31]);
+                    System.out.println();
                     break;
 
                 case "s":
-                    numSteps = (tokens.length > 1) ? Integer.parseInt(tokens[1]) : 1;
+                    if(tokens.length > 1) {
+                        numSteps = Integer.parseInt(tokens[1]);
+                    } else {
+                        numSteps = 1;
+                    }
+                    
                     for (int i = 0; i < numSteps; i++) {
                         if (pc >= instructionsList.size()) {
                             System.out.println("End of instructions list.");
                             break;
                         }
                         ProcessInstructionHelper.ProcessInstruction(instructionsList.get(pc));
-                        pc++;
+                        pc++;                        
                     }
+                    System.out.printf("        %d instruction(s) executed\n", numSteps);
                     break;
 
                 case "r":
                     while (pc < instructionsList.size()) {
-                        ProcessInstructionHelper.ProcessInstruction(instructionsList.get(pc));
-                        pc++;
+                        Instruction instruction = instructionsList.get(pc);
+                        if(!ProcessInstructionHelper.ProcessInstruction(instruction)){                        
+                            pc++;
+                        }
                     }
-                    System.out.println("Program execution complete.");
+
                     break;
 
                 case "m":
@@ -139,11 +173,10 @@ public class lab2 {
                     java.util.Arrays.fill(Registers, 0);
                     java.util.Arrays.fill(dataMemory, 0);
                     pc = 0;
-                    System.out.println("Cleared all registers, memory, and program counter.");
+                    System.out.println("        Simulator reset\n");
                     break;
 
-                case "q":
-                    System.out.println("Exiting program.");
+                case "q":                    
                     break;
 
                 default:
@@ -266,7 +299,9 @@ public class lab2 {
                     if (instruction == null) {
                         break;
                     } else {
-                        instruction.setLabelName(currentLabelName);
+                        if(instruction.getLabelName() == null || instruction.getLabelName() == "") {
+                            instruction.setLabelName(currentLabelName);
+                        }
                         instructionsList.add(instruction);
                     }
 
@@ -853,23 +888,7 @@ public class lab2 {
                     instruction.setTarget(rtString);
                 }
 
-                try {
-                    // Calculating and formatting the offset
-                    int targetAddress = labelToLineMap.get(segments[3]);
-                    int currentAddress = currentInstructionIndex;
-                    int offsetValue = targetAddress - (currentAddress + 1);
-                    String offsetString = Integer.toBinaryString(offsetValue & 0xFFFF);
-                    if (offsetString.length() > 16) {
-                        offsetString = offsetString.substring(offsetString.length() - 16); // Correcting length if
-                                                                                           // necessary
-                    }
-                    offsetString = String.format("%16s", offsetString).replace(' ', '0');
-                    result += " " + offsetString;
-                    instruction.setImm(offsetString);
-                } catch (NumberFormatException e) {
-                    result += " 0000000000000000";
-                    instruction.setImm("0000000000000000");
-                }
+                instruction.setLabelName(segments[3]);
 
                 instruction.setDest(null);
                 instruction.setFunction(null);
@@ -903,18 +922,8 @@ public class lab2 {
                 }
 
                 // offset (16 bits)
-                try {
-                    // offset (16 bits) calculated from label
-                    int targetAddress = labelToLineMap.get(segments[3]);
-                    int currentAddress = currentInstructionIndex;
-                    int offsetValue = targetAddress - (currentAddress + 1);
-                    String offsetString = Integer.toBinaryString(0x10000 | (offsetValue & 0xFFFF)).substring(1);
-                    result += " " + offsetString;
-                    instruction.setImm(offsetString);
-                } catch (NumberFormatException e) {
-                    result += " 0000000000000000"; //
-                    instruction.setImm("0000000000000000");
-                }
+                instruction.setLabelName(segments[3]);
+
 
                 instruction.setDest(null);
                 instruction.setFunction(null);
@@ -1040,23 +1049,8 @@ public class lab2 {
                 instruction.setOpcode("000010");
 
                 // segments[1] is the label name
-                String jLabel = segments[1]; // This should be a label like 'test1'
+                instruction.setLabelName(segments[1]); // This should be a label like 'test1'
 
-                // Retrieve the address from the map
-                Integer labelAddress = labelToLineMap.get(jLabel);
-
-                if (labelAddress == null) {
-                    // If no address found, handle as an error or set a default
-                    result += " " + "00000000000000000000000000";
-                    instruction.setJump("00000000000000000000000000");
-                } else {
-                    // Convert the address to a 26-bit binary string
-                    String addressString = Integer.toBinaryString(labelAddress & 0x03FFFFFF); // Mask to ensure it's
-                                                                                              // within 26 bits
-                    addressString = String.format("%26s", addressString).replace(' ', '0');
-                    result += " " + addressString;
-                    instruction.setJump(addressString);
-                }
                 instruction.setSource(null);
                 instruction.setDest(null);
                 instruction.setFunction(null);
@@ -1074,25 +1068,7 @@ public class lab2 {
 
                 // Address (26 bits)
                 // segment[1] contains the label
-                String labelName = segments[1];
-                int address;
-                if (labelToLineMap.containsKey(labelName)) {
-                    address = labelToLineMap.get(labelName);
-                } else {
-                    try {
-                        address = Integer.parseInt(labelName);
-                    } catch (NumberFormatException e) {
-                        address = 0; // Default address if parsing fails or label not found
-                    }
-                }
-
-                // Convert the address to a 26-bit binary string
-                String addressString = Integer.toBinaryString(address & 0x03FFFFFF); // Mask to ensure it's within 26
-                                                                                     // bits
-                addressString = String.format("%26s", addressString).replace(' ', '0'); // Pad with zeros if necessary
-                result += " " + addressString;
-                instruction.setJump(addressString);
-                
+                instruction.setLabelName(segments[1]);                
                 instruction.setSource(null);
                 instruction.setDest(null);
                 instruction.setFunction(null);
@@ -1107,8 +1083,6 @@ public class lab2 {
                 instruction = null;
                 break;
         }
-
-        System.out.println(result);
 
         return instruction;
     }
