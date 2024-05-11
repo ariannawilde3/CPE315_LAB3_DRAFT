@@ -103,8 +103,7 @@ public class lab3 {
             String[] tokens = command.split("\\s+");
             
             switch (tokens[0]) {
-                case "h":
-                    System.out.println("Available commands:");
+                case "h":                    
                     System.out.println("h = show help");
                     System.out.println("d = dump register state");
                     System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
