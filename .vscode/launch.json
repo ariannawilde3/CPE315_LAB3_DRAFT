@@ -12,16 +12,16 @@
         },
         {
             "type": "java",
-            "name": "lab2",
+            "name": "lab3",
             "request": "launch",
-            "mainClass": "lab2",
+            "mainClass": "lab3",
             "projectName": "CPE315_LAB3_DRAFT_68b0855"
         },
         {
             "type": "java",
             "name": "lab3 with args",
             "request": "launch",
-            "mainClass": "lab2",
+            "mainClass": "lab3",
             "projectName": "CPE315_LAB3_DRAFT_68b0855",
             "args": [
                 "input1.asm" //,

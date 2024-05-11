@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class lab2 {
+public class lab3 {
 
     // Label name and the line numbers that the label is seen on
     public static HashMap<String, Integer> labelToLineMap = new HashMap<String, Integer>();
@@ -295,7 +295,7 @@ public class lab2 {
                 finalLabelInstruction = finalLabelInstruction.trim();
 
                 if (finalInstruction != null && finalInstruction.length() > 0) {
-                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalInstruction, lineCount);                    
+                    Instruction instruction = lab3.convertSpaceSeparatedLineToBinaryString(finalInstruction, lineCount);                    
                     if (instruction == null) {
                         break;
                     } else {
@@ -316,7 +316,7 @@ public class lab2 {
                     labelToInstructionMap.put(finalLabelName, finalLabelInstruction);
                     //instructionArray.add(finalLabelInstruction);
 
-                    Instruction instruction = lab2.convertSpaceSeparatedLineToBinaryString(finalLabelInstruction, lineCount);
+                    Instruction instruction = lab3.convertSpaceSeparatedLineToBinaryString(finalLabelInstruction, lineCount);
                     if (instruction == null) {
                         break;
                     } else {

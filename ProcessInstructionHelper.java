@@ -4,8 +4,7 @@ public class ProcessInstructionHelper {
     }
     // return true if pc is moved
     public static Boolean ProcessInstruction(Instruction instruction) {                  
-            int j = 0;
-            String label;
+                    
             int sourceIndex = 0;
             int targetIndex = 0;
             int destIndex = 0;
@@ -20,7 +19,7 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
             
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] & lab2.Registers[targetIndex];
+                    lab3.Registers[destIndex] = lab3.Registers[sourceIndex] & lab3.Registers[targetIndex];
 
                     break;
 
@@ -30,7 +29,7 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
         
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] | lab2.Registers[targetIndex];
+                    lab3.Registers[destIndex] = lab3.Registers[sourceIndex] | lab3.Registers[targetIndex];
 
                     break;
 
@@ -40,7 +39,7 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
                     
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] + lab2.Registers[targetIndex];
+                    lab3.Registers[destIndex] = lab3.Registers[sourceIndex] + lab3.Registers[targetIndex];
 
                     break;
 
@@ -54,7 +53,7 @@ public class ProcessInstructionHelper {
                     }
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
-                    lab2.Registers[targetIndex] = lab2.Registers[sourceIndex] + immediate;
+                    lab3.Registers[targetIndex] = lab3.Registers[sourceIndex] + immediate;
 
                     break;
 
@@ -68,7 +67,7 @@ public class ProcessInstructionHelper {
                     }
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
             
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] << immediate;
+                    lab3.Registers[destIndex] = lab3.Registers[sourceIndex] << immediate;
 
                     break;
 
@@ -78,7 +77,7 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
                 
-                    lab2.Registers[destIndex] = lab2.Registers[sourceIndex] - lab2.Registers[targetIndex];
+                    lab3.Registers[destIndex] = lab3.Registers[sourceIndex] - lab3.Registers[targetIndex];
 
                     break;
 
@@ -88,10 +87,10 @@ public class ProcessInstructionHelper {
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
                     destIndex = Integer.parseInt(instruction.getDest(), 2);
 
-                    if (lab2.Registers[sourceIndex] < lab2.Registers[targetIndex]) {
-                        lab2.Registers[destIndex] = 1;
+                    if (lab3.Registers[sourceIndex] < lab3.Registers[targetIndex]) {
+                        lab3.Registers[destIndex] = 1;
                     } else {
-                        lab2.Registers[destIndex] = 0;
+                        lab3.Registers[destIndex] = 0;
                     }
 
                     break;
@@ -100,8 +99,8 @@ public class ProcessInstructionHelper {
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);            
             
-                    if (lab2.Registers[sourceIndex] == lab2.Registers[targetIndex]) {
-                        lab2.pc =  getLabelAddr(instruction.getLabelName());  
+                    if (lab3.Registers[sourceIndex] == lab3.Registers[targetIndex]) {
+                        lab3.pc =  getLabelAddr(instruction.getLabelName());  
                         pcMoved = true;
                     }
 
@@ -114,8 +113,8 @@ public class ProcessInstructionHelper {
             
                     // if(R[rs]!=R[rt])
                     // PC=PC+1+BranchAddr
-                    if (lab2.Registers[sourceIndex] != lab2.Registers[targetIndex]) {
-                        lab2.pc = getLabelAddr(instruction.getLabelName());  
+                    if (lab3.Registers[sourceIndex] != lab3.Registers[targetIndex]) {
+                        lab3.pc = getLabelAddr(instruction.getLabelName());  
                         pcMoved = true;
                     }
 
@@ -131,8 +130,8 @@ public class ProcessInstructionHelper {
                     
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
-                    memoryAddress = lab2.Registers[sourceIndex] + immediate;
-                    lab2.Registers[targetIndex] = lab2.dataMemory[memoryAddress];
+                    memoryAddress = lab3.Registers[sourceIndex] + immediate;
+                    lab3.Registers[targetIndex] = lab3.dataMemory[memoryAddress];
 
                     break; 
                 case "sw":
@@ -145,13 +144,13 @@ public class ProcessInstructionHelper {
                     }
                     targetIndex = Integer.parseInt(instruction.getTarget(), 2);
 
-                    int memoryAddressSW = lab2.Registers[sourceIndex] + immediate;
-                    lab2.dataMemory[memoryAddressSW] = lab2.Registers[targetIndex];
+                    int memoryAddressSW = lab3.Registers[sourceIndex] + immediate;
+                    lab3.dataMemory[memoryAddressSW] = lab3.Registers[targetIndex];
 
                     break; 
 
                 case "j":
-                    lab2.pc = getLabelAddr(instruction.getLabelName());
+                    lab3.pc = getLabelAddr(instruction.getLabelName());
                     pcMoved = true;
 
                     break;
@@ -159,15 +158,15 @@ public class ProcessInstructionHelper {
                 case "jr":
 
                     sourceIndex = Integer.parseInt(instruction.getSource(), 2);
-                    lab2.pc = lab2.Registers[sourceIndex];
+                    lab3.pc = lab3.Registers[sourceIndex];
                     pcMoved = true;
 
                     break;
 
                 case "jal":
                 
-                    lab2.Registers[31] = lab2.pc + 1;
-                    lab2.pc = getLabelAddr(instruction.getLabelName());
+                    lab3.Registers[31] = lab3.pc + 1;
+                    lab3.pc = getLabelAddr(instruction.getLabelName());
                     pcMoved = true;
 
                     break;
@@ -186,7 +185,7 @@ public class ProcessInstructionHelper {
             int addr = -1;
             
             if(labelName != null && labelName != "") {
-                addr = lab2.labelToLineMap.get(labelName);
+                addr = lab3.labelToLineMap.get(labelName);
             }
 
             return addr;
