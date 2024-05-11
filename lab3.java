@@ -162,7 +162,7 @@ public class lab3 {
                         int start = Integer.parseInt(tokens[1]);
                         int end = Integer.parseInt(tokens[2]);
                         for (int i = start; i <= end; i++) {
-                            System.out.printf("Memory[%d] = %d\n", i, dataMemory[i]);
+                            System.out.printf("[%d] = %d\n", i, dataMemory[i]);
                         }
                     } else {
                         System.out.println("Invalid memory range.");
