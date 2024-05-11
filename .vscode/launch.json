@@ -24,8 +24,8 @@
             "mainClass": "lab3",
             "projectName": "CPE315_LAB3_DRAFT_68b0855",
             "args": [
-                "input1.asm" //,
-                //"path/to/your/script_file" // Optional: remove this line if no script file is to be passed
+                "input1.asm",
+                "script1.script" // Optional: remove this line if no script file is to be passed
             ]
         }
     ]

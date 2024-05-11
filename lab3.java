@@ -141,8 +141,10 @@ public class lab3 {
                             System.out.println("End of instructions list.");
                             break;
                         }
-                        ProcessInstructionHelper.ProcessInstruction(instructionsList.get(pc));
-                        pc++;                        
+                        Instruction instruction = instructionsList.get(pc);
+                        if(!ProcessInstructionHelper.ProcessInstruction(instruction)){                        
+                            pc++;
+                        }                        
                     }
                     System.out.printf("        %d instruction(s) executed\n", numSteps);
                     break;
